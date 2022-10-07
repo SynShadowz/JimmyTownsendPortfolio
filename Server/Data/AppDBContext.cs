@@ -7,7 +7,7 @@ public class AppDBContext : DbContext
 {
     public DbSet<Category> Categories { get; set; }
 
-	public AppDBContext(DbContextOptions<DbContext> options) : base(options) {}
+	public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) {}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
