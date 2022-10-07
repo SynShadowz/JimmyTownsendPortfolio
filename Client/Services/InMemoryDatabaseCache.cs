@@ -17,7 +17,7 @@ internal sealed class InMemoryDatabaseCache
 
 	internal List<Category> Categories
 	{
-		get => _categories ?? (_categories = new List<Category>());
+		get => _categories;
 		set
 		{
 			_categories = value;
