@@ -17,16 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\assets\img\Other\" />
     <Folder Include="wwwroot\assets\img\publicbackgrounds\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="wwwroot\assets\img\Other\placeholder.jpg" />
   </ItemGroup>
 
 </Project>
