@@ -1,4 +1,5 @@
-﻿using Shared.Models;
+﻿using Client.Static;
+using Shared.Models;
 using System.Net.Http.Json;
 
 namespace Client.Services;
@@ -24,12 +25,20 @@ internal sealed class InMemoryDatabaseCache
 		}
 	}
 
-	internal async Task GetCategoriesFromDatabaseAndCache()
-	{
-		_categories = await _httpClient.GetFromJsonAsync<List<Category>>("endpoint");
-	}
+	private bool GettingCategoriesFromDatabaseAndCaching = false;
 
-	internal event Action OnCategoriesDataChanged;
+    internal async Task GetCategoriesFromDatabaseAndCache()
+	{
+		// Only allow Get request to run at a time
+		if (!GettingCategoriesFromDatabaseAndCaching)
+		{
+			GettingCategoriesFromDatabaseAndCaching = true;
+            _categories = await _httpClient.GetFromJsonAsync<List<Category>>(APIEndpoints.s_categories);
+			GettingCategoriesFromDatabaseAndCaching = false;
+        }
+    }
+
+    internal event Action OnCategoriesDataChanged;
 
 	private void NotifyCategoriesDataChanged() => OnCategoriesDataChanged?.Invoke();
 }
