@@ -13,9 +13,9 @@ internal sealed class InMemoryDatabaseCache
 		_httpClient = httpClient;
 	}
 
-	private List<Post> _categories = null;
+	private List<Category> _categories = null;
 
-	internal List<Post> Categories
+	internal List<Category> Categories
 	{
 		get => _categories;
 		set
@@ -33,7 +33,7 @@ internal sealed class InMemoryDatabaseCache
 		if (!GettingCategoriesFromDatabaseAndCaching)
 		{
 			GettingCategoriesFromDatabaseAndCaching = true;
-            _categories = await _httpClient.GetFromJsonAsync<List<Post>>(APIEndpoints.s_categories);
+            _categories = await _httpClient.GetFromJsonAsync<List<Category>>(APIEndpoints.s_categories);
 			GettingCategoriesFromDatabaseAndCaching = false;
         }
     }
