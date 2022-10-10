@@ -31,7 +31,7 @@ public class AppDBContext : DbContext
             };
         }
 
-        modelBuilder.Entity<Post>().HasData(categoriesToSeed);
+        modelBuilder.Entity<Category>().HasData(categoriesToSeed);
 
         #endregion
 
