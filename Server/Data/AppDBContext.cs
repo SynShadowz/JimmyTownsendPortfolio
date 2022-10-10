@@ -5,7 +5,7 @@ namespace Server.Data;
 
 public class AppDBContext : DbContext
 {
-    public DbSet<Category> Categories { get; set; }
+    public DbSet<Post> Categories { get; set; }
 
 	public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) {}
 
@@ -14,11 +14,11 @@ public class AppDBContext : DbContext
         // Call the base version of this method as well, else we get an error later on.
         base.OnModelCreating(modelBuilder);
 
-        Category[] categoriesToSeed = new Category[3];
+        Post[] categoriesToSeed = new Post[3];
 
         for (int i = 1; i < 4; i++)
         {
-            categoriesToSeed[i - 1] = new Category
+            categoriesToSeed[i - 1] = new Post
             {
                 CategoryId = i,
                 ThumbnailImagePath = "uploads/placeholder.jpg",
@@ -27,6 +27,6 @@ public class AppDBContext : DbContext
             };
         }
 
-        modelBuilder.Entity<Category>().HasData(categoriesToSeed);
+        modelBuilder.Entity<Post>().HasData(categoriesToSeed);
     }
 }

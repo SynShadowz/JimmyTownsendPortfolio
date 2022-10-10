@@ -12,4 +12,5 @@ public class Category
     public string Name { get; set; }
     [Required, MaxLength(1024)]
     public string Description { get; set; }
+    public List<Post> Posts { get; set; }
 }

@@ -20,7 +20,7 @@ public class CategoriesController : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> Get()
 	{
-		List<Category> categories = await _appDBContext.Categories.ToListAsync();
+		List<Post> categories = await _appDBContext.Categories.ToListAsync();
 
 		return Ok(categories);
 	}
