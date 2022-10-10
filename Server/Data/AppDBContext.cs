@@ -39,7 +39,7 @@ public class AppDBContext : DbContext
         {
             entity.HasOne(post => post.Category)
             .WithMany(category => category.Posts)
-            .HasForeignKey("CategoryId")
+            .HasForeignKey("CategoryId");
         });
 
         #region Posts seed
