@@ -17,6 +17,8 @@ public class CategoriesController : ControllerBase
 		_appDBContext = appDBContext;
 	}
 
+	#region CRUD Methods
+
 	[HttpGet]
 	public async Task<IActionResult> Get()
 	{
@@ -24,4 +26,69 @@ public class CategoriesController : ControllerBase
 
 		return Ok(categories);
 	}
+
+	// website.com/api/categories/withposts
+	[HttpGet("withposts")]
+	public async Task<IActionResult> GetWithPosts()
+	{
+		List<Category> categories = await _appDBContext.Categories
+			.Include(category => category.Posts)
+			.ToListAsync();
+
+		return Ok(categories);
+	}
+
+	// website.com/api/categories/id
+	[HttpGet("{id}")]
+	public async Task<IActionResult> Get(int id)
+	{
+		Category category = await GetCategoryByCategoryId(id, false);
+
+		return Ok(category);
+	}
+
+    // website.com/api/categories/id
+    [HttpGet("withposts/{id}")]
+    public async Task<IActionResult> GetWithPosts(int id)
+    {
+        Category category = await GetCategoryByCategoryId(id, true);
+
+        return Ok(category);
+    }
+
+    #endregion
+
+    #region Utility Methods
+
+    [NonAction]
+	[ApiExplorerSettings(IgnoreApi = true)]
+	private async Task<bool> PersistChangesToDatabase()
+	{
+		int amountofChanges = await _appDBContext.SaveChangesAsync();
+
+		return amountofChanges > 0;
+	}
+
+	[NonAction]
+	[ApiExplorerSettings(IgnoreApi = true)]
+	private async Task<Category> GetCategoryByCategoryId(int categoryId, bool withPosts)
+	{
+		Category categoryToGet = null;
+
+		if (withPosts)
+		{
+			categoryToGet = await _appDBContext.Categories
+				.Include(category => category.Posts)
+				.FirstAsync(category => category.CategoryId == categoryId);
+		}
+		else
+		{
+			categoryToGet = await _appDBContext.Categories
+				.FirstAsync(category => category.CategoryId == categoryId);
+		}
+
+		return categoryToGet;
+	}
+
+	#endregion
 }
