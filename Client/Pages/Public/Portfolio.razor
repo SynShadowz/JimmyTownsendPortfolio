@@ -2,6 +2,12 @@
 
 <Client.Components.Public.Shared.Navbar />
 
+@if (_showingExamplePrtfolioProjectModalWindow == true)
+{
+    <Client.Components.Public.Portfolio.ExamplePortfolioProjectModalWindow 
+            ParentMethodToCallOnClickBtnClose="() => _showingExamplePrtfolioProjectModalWindow = false" />
+}
+
 <main class="container min-vh-90 py-5">
     <div class="row">
         <div class="col">
@@ -21,7 +27,8 @@
                             </p>
                         </div>
 
-                        <button class="btn btn-primary stretched-link">
+                        <button @onclick="() => _showingExamplePrtfolioProjectModalWindow = true" 
+                                class="btn btn-primary stretched-link">
                             <i class="fas fa-info-circle"></i> More Information
                         </button>
                     </div>
@@ -38,7 +45,8 @@
                             </p>
                         </div>
 
-                        <button class="btn btn-primary stretched-link">
+                        <button @onclick="() => _showingExamplePrtfolioProjectModalWindow = true" 
+                                class="btn btn-primary stretched-link">
                             <i class="fas fa-info-circle"></i> More Information
                         </button>
                     </div>
@@ -55,7 +63,8 @@
                             </p>
                         </div>
 
-                        <button class="btn btn-primary stretched-link">
+                        <button @onclick="() => _showingExamplePrtfolioProjectModalWindow = true" 
+                                class="btn btn-primary stretched-link">
                             <i class="fas fa-info-circle"></i> More Information
                         </button>
                     </div>
@@ -69,5 +78,7 @@
 <Client.Components.Public.Shared.Footer />
 
 @code {
+    private bool _showingExamplePrtfolioProjectModalWindow = false;
+
     private string _exampleExcerpt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ultrices viverra magna. Proin dui erat, posuere at nisl cursus, hendrerit dapibus nibh. Praesent felis justo, finibus viverra elementum ac, bibendum ut nunc. Nulla rutrum mattis urna, vel pretium felis ultrices vitae. Aliquam a dictum nibh, sit amet bibendum enim. Integer finibus massa vitae enim iaculis maximus. Vestibulum a pharetra ex, vel porttitor mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Pellentesque in felis in elit aliquam consequat. Nullam maximus ornare elit, scelerisque viverra est egestas id. Aliquam hendrerit sapien ex, ac dictum orci imperdiet in.";
 }
