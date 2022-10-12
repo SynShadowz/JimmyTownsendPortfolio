@@ -1,12 +1,12 @@
 ﻿namespace Server.Controllers;
 
 [Route("api/[controller]"), ApiController]
-public class CategoriesController : ControllerBase
+public class PostsController : ControllerBase
 {
 	private readonly AppDBContext _appDBContext;
 	private readonly IWebHostEnvironment _webHostEnvironment;
 
-	public CategoriesController(AppDBContext appDBContext, IWebHostEnvironment webHostEnvironment)
+	public PostsController(AppDBContext appDBContext, IWebHostEnvironment webHostEnvironment)
 	{
 		_appDBContext = appDBContext;
 		_webHostEnvironment = webHostEnvironment;
@@ -17,46 +17,28 @@ public class CategoriesController : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> Get()
 	{
-		List<Category> categories = await _appDBContext.Categories.ToListAsync();
-
-		return Ok(categories);
-	}
-
-	// website.com/api/categories/withposts
-	[HttpGet("withposts")]
-	public async Task<IActionResult> GetWithPosts()
-	{
-		List<Category> categories = await _appDBContext.Categories
-			.Include(category => category.Posts)
+		List<Post> posts = await _appDBContext.Posts
+			.Include(post => post.Category)
 			.ToListAsync();
 
-		return Ok(categories);
+		return Ok(posts);
 	}
 
-	// website.com/api/categories/id
+	// website.com/api/posts/id
 	[HttpGet("{id}")]
 	public async Task<IActionResult> Get(int id)
 	{
-		Category category = await GetCategoryByCategoryId(id, false);
+		Post post = await GetPostByPostId(id);
 
-		return Ok(category);
+		return Ok(post);
 	}
 
-    // website.com/api/categories/id
-    [HttpGet("withposts/{id}")]
-    public async Task<IActionResult> GetWithPosts(int id)
-    {
-        Category category = await GetCategoryByCategoryId(id, true);
-
-        return Ok(category);
-    }
-
 	[HttpPost]
-	public async Task<IActionResult> Create([FromBody]Category categoryToCreate)
+	public async Task<IActionResult> Create([FromBody]Post postToCreate)
 	{
 		try
 		{
-			if (categoryToCreate is null)
+			if (postToCreate is null)
 			{
 				return BadRequest(ModelState);
 			}
@@ -66,13 +48,19 @@ public class CategoriesController : ControllerBase
 				return BadRequest(ModelState);
 			}
 
-			await _appDBContext.Categories.AddAsync(categoryToCreate);
+			if (postToCreate.Published)
+			{
+				// American DateTime
+				postToCreate.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
+			}
+
+			await _appDBContext.Posts.AddAsync(postToCreate);
 
 			bool changesPersistedToDatabase = await PersistChangesToDatabase();
 
 			if (changesPersistedToDatabase)
 			{
-				return Created("Create", categoryToCreate);
+				return Created("Create", postToCreate);
 			}
 			else
 			{
@@ -86,34 +74,38 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpPut("{id}")]
-	public async Task<IActionResult> Update(int id, [FromBody] Category updatedCategory)
+	public async Task<IActionResult> Update(int id, [FromBody] Post updatedPost)
 	{
 		try
 		{
-			if (id < 1 || updatedCategory is null || id != updatedCategory.CategoryId)
+			if (id < 1 || updatedPost is null || id != updatedPost.PostId)
             {
                 return BadRequest(ModelState);
             }
 
-			bool exists = await _appDBContext.Categories.AnyAsync(category => category.CategoryId == id);
+			Post? oldPost = await _appDBContext.Posts.FindAsync(id);
 
-			if (!exists)
-			{
+			if (oldPost is null)
 				return NotFound();
-			}
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _appDBContext.Categories.Update(updatedCategory);
+			if (!oldPost.Published && updatedPost.Published)
+				updatedPost.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
+
+			// Detach old post from EF else it can't be updated
+			_appDBContext.Entry(oldPost).State = EntityState.Detached;
+
+            _appDBContext.Posts.Update(updatedPost);
 
             bool changesPersistedToDatabase = await PersistChangesToDatabase();
 
             if (changesPersistedToDatabase)
             {
-				return NoContent();
+				return Created("Created", updatedPost);
             }
             else
             {
@@ -136,7 +128,7 @@ public class CategoriesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            bool exists = await _appDBContext.Categories.AnyAsync(category => category.CategoryId == id);
+            bool exists = await _appDBContext.Posts.AnyAsync(post => post.PostId == id);
 
             if (!exists)
             {
@@ -148,16 +140,16 @@ public class CategoriesController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-			Category categoryToDelete = await GetCategoryByCategoryId(id, false);
+			Post postToDelete = await GetPostByPostId(id);
 
-			if (categoryToDelete.ThumbnailImagePath != "uploads/placeholder.jpg")
+			if (postToDelete.ThumbnailImagePath != "uploads/placeholder.jpg")
 			{
-				string fileName = categoryToDelete.ThumbnailImagePath.Split('/').Last();
+				string fileName = postToDelete.ThumbnailImagePath.Split('/').Last();
 
 				System.IO.File.Delete($"{_webHostEnvironment.ContentRootPath}\\wwwroot\\uploads\\{fileName}");
 			}
 
-			_appDBContext.Categories.Remove(categoryToDelete);
+			_appDBContext.Posts.Remove(postToDelete);
 
             bool changesPersistedToDatabase = await PersistChangesToDatabase();
 
@@ -191,23 +183,13 @@ public class CategoriesController : ControllerBase
 
 	[NonAction]
 	[ApiExplorerSettings(IgnoreApi = true)]
-	private async Task<Category> GetCategoryByCategoryId(int categoryId, bool withPosts)
+	private async Task<Post> GetPostByPostId(int postId)
 	{
-		Category? categoryToGet = null;
+		Post postToGet = await _appDBContext.Posts
+			.Include(post => post.Category)
+			.FirstAsync(post => post.PostId == postId);
 
-		if (withPosts)
-		{
-			categoryToGet = await _appDBContext.Categories
-				.Include(category => category.Posts)
-				.FirstAsync(category => category.CategoryId == categoryId);
-		}
-		else
-		{
-			categoryToGet = await _appDBContext.Categories
-				.FirstAsync(category => category.CategoryId == categoryId);
-		}
-
-		return categoryToGet;
+		return postToGet;
 	}
 
 	#endregion

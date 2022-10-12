@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Shared.Models;
-using System;
-
-namespace Server.Data;
+﻿namespace Server.Data;
 
 public class AppDBContext : DbContext
 {

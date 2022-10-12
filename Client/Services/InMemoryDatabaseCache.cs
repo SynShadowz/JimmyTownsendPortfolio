@@ -1,8 +1,4 @@
-﻿using Client.Static;
-using Shared.Models;
-using System.Net.Http.Json;
-
-namespace Client.Services;
+﻿namespace Client.Services;
 
 internal sealed class InMemoryDatabaseCache
 {
@@ -13,9 +9,9 @@ internal sealed class InMemoryDatabaseCache
 		_httpClient = httpClient;
 	}
 
-	private List<Category> _categories = null;
+	private List<Category>? _categories = null;
 
-	internal List<Category> Categories
+	internal List<Category>? Categories
 	{
 		get => _categories;
 		set

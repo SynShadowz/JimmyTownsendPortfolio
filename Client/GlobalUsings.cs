@@ -1,0 +1,11 @@
+﻿global using Client.Services;
+global using Client.Static;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Microsoft.Extensions.DependencyInjection;
+global using Shared.Models;
+global using System;
+global using System.Collections.Generic;
+global using System.Net.Http;
+global using System.Net.Http.Json;
+global using System.Threading.Tasks;
