@@ -1,15 +1,19 @@
-﻿namespace Server.Controllers;
+﻿using AutoMapper;
+
+namespace Server.Controllers;
 
 [Route("api/[controller]"), ApiController]
 public class PostsController : ControllerBase
 {
 	private readonly AppDBContext _appDBContext;
 	private readonly IWebHostEnvironment _webHostEnvironment;
+	private readonly IMapper _mapper;
 
-	public PostsController(AppDBContext appDBContext, IWebHostEnvironment webHostEnvironment)
+	public PostsController(AppDBContext appDBContext, IWebHostEnvironment webHostEnvironment, IMapper mapper)
 	{
 		_appDBContext = appDBContext;
 		_webHostEnvironment = webHostEnvironment;
+		_mapper = mapper;
 	}
 
 	#region CRUD Methods
@@ -34,11 +38,11 @@ public class PostsController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> Create([FromBody]Post postToCreate)
+	public async Task<IActionResult> Create([FromBody]PostDTO postToCreateDTO)
 	{
 		try
 		{
-			if (postToCreate is null)
+			if (postToCreateDTO is null)
 			{
 				return BadRequest(ModelState);
 			}
@@ -48,10 +52,12 @@ public class PostsController : ControllerBase
 				return BadRequest(ModelState);
 			}
 
+			Post postToCreate = _mapper.Map<Post>(postToCreateDTO);
+
 			if (postToCreate.Published)
 			{
-				// American DateTime
-				postToCreate.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
+                // American DateTime
+                postToCreate.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
 			}
 
 			await _appDBContext.Posts.AddAsync(postToCreate);
@@ -60,7 +66,7 @@ public class PostsController : ControllerBase
 
 			if (changesPersistedToDatabase)
 			{
-				return Created("Create", postToCreate);
+				return Created("Create", postToCreateDTO);
 			}
 			else
 			{
@@ -74,11 +80,11 @@ public class PostsController : ControllerBase
 	}
 
 	[HttpPut("{id}")]
-	public async Task<IActionResult> Update(int id, [FromBody] Post updatedPost)
+	public async Task<IActionResult> Update(int id, [FromBody] PostDTO updatedPostDTO)
 	{
 		try
 		{
-			if (id < 1 || updatedPost is null || id != updatedPost.PostId)
+			if (id < 1 || updatedPostDTO is null || id != updatedPostDTO.PostId)
             {
                 return BadRequest(ModelState);
             }
@@ -93,8 +99,23 @@ public class PostsController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-			if (!oldPost.Published && updatedPost.Published)
-				updatedPost.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
+			Post updatedPost = _mapper.Map<Post>(updatedPostDTO);
+
+			if (updatedPost.Published)
+			{
+				if (oldPost.Published)
+				{
+					updatedPost.PublishDate = oldPost.PublishDate;
+				}
+                else
+				{
+                    updatedPost.PublishDate = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm");
+                }
+            }
+			else
+			{
+				updatedPost.PublishDate = string.Empty;
+			}
 
 			// Detach old post from EF else it can't be updated
 			_appDBContext.Entry(oldPost).State = EntityState.Detached;
