@@ -1,4 +1,6 @@
-﻿namespace Client.Services;
+﻿using System.Linq;
+
+namespace Client.Services;
 
 internal sealed class InMemoryDatabaseCache
 {
@@ -21,7 +23,18 @@ internal sealed class InMemoryDatabaseCache
 		}
 	}
 
-	private bool GettingCategoriesFromDatabaseAndCaching = false;
+	internal async Task<Category> GetCategoryByCategoryId(int categoryId)
+	{
+		if (_categories == null)
+		{
+			await GetCategoriesFromDatabaseAndCache();
+		}
+
+		return _categories.First(c => c.CategoryId == categoryId);
+	}
+
+
+    private bool GettingCategoriesFromDatabaseAndCaching = false;
 
     internal async Task GetCategoriesFromDatabaseAndCache()
 	{
