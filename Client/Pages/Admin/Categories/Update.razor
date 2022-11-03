@@ -81,7 +81,7 @@
     [Parameter] public int CategoryId { get; set; }
     protected async override Task OnParametersSetAsync()
     {
-        _categoryToUpdate = await InMemoryDatabaseCache.GetCategoryByCategoryId(CategoryId);
+        _categoryToUpdate = await InMemoryDatabaseCache.GetCategoryByCategoryId(CategoryId, true);
     }
 
     [Inject] HttpClient HttpClient { get; set; }
