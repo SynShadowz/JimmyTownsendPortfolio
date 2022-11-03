@@ -83,7 +83,7 @@
 
         if (response.StatusCode == System.Net.HttpStatusCode.Created)
         {
-            Category? addedCategory = await response.Content.ReadFromJsonAsync<Category>();
+            Category addedCategory = await response.Content.ReadFromJsonAsync<Category>();
             InMemoryDatabaseCache.Categories?.Add(addedCategory!);
 
             _createSuccessful = true;

@@ -99,7 +99,7 @@
 
         if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
         {
-            Category? unupdatedCategoryInList = InMemoryDatabaseCache.Categories?.Single(c => c.CategoryId == CategoryId);
+            Category unupdatedCategoryInList = InMemoryDatabaseCache.Categories?.Single(c => c.CategoryId == CategoryId);
             UtilityFunctions.CopyObjectProperties(_categoryToUpdate, unupdatedCategoryInList!);
 
             _updateSuccessful = true;
