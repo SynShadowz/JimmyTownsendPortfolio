@@ -64,9 +64,9 @@
                             <InputText @bind-Value="_postToCreate.Excerpt" class="form-control" id="postExcerpt" />
                         </div>
 
-                        <div class="form-group mb-5">
-                            <label for="postContent">Post Content</label>
-                            <InputText @bind-Value="_postToCreate.Content" class="form-control" id="postContent" />
+                        <div class="form-group mb-5 flex-shrink-1">
+                            <label>Post Content</label>
+                            <div @ref="_quillJSEditorDiv" class="border border-secondary p-4"></div>
                         </div>
 
                         <div class="form-group mb-5">
@@ -100,12 +100,25 @@
 </main>
 
 @code {
-    [Inject] HttpClient HttpClient { get; set; }
     [Inject] InMemoryDatabaseCache InMemoryDatabaseCache { get; set; }
-    private PostDTO _postToCreate = new()
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    private ElementReference _quillJSEditorDiv;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            ThumbnailImagePath = "uploads/placeholder.jpg",
-        };
+            if (InMemoryDatabaseCache.Categories is null)
+            {
+                await InMemoryDatabaseCache.GetCategoriesFromDatabaseAndCache(false);
+                StateHasChanged();
+            }
+
+            await JSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", _quillJSEditorDiv, true);
+        }
+    }
+
+    [Inject] HttpClient HttpClient { get; set; }
+    private PostDTO _postToCreate = new() { ThumbnailImagePath = "uploads/placeholder.jpg" };
     private bool _attemptingToCreate = false;
     private bool _attemptToCreateFailed = false;
     private bool _createSuccessful = false;
@@ -113,6 +126,8 @@
     private async Task CreatePost()
     {
         _attemptingToCreate = true;
+
+        _postToCreate.Content = await JSRuntime.InvokeAsync<string>("QuillFunctions.getQuillContent", _quillJSEditorDiv);
 
         HttpResponseMessage response = await HttpClient.PostAsJsonAsync<PostDTO>(APIEndpoints.s_posts, _postToCreate);
 

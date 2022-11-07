@@ -12,51 +12,51 @@
                 bounds: quillElement
             };
 
-            new Quill(quillElement, options)
+            new Quill(quillElement, options);
         },
-        getQuillContent: function (quillControl) {
-            return JSON.stringify(quillControl.__quill.getContents());
+        getQuillContent: function (quillElement) {
+            return JSON.stringify(quillElement.__quill.getContents());
         },
-        setQuillContent: function (quillControl, quillContent) {
+        setQuillContent: function (quillElement, quillContent) {
             content = JSON.parse(quillContent);
-            return quillControl.__quill.setContents(content, 'api');
+            return quillElement.__quill.setContents(content, 'api');
         },
-        disableQuillEditor: function (quillControl) {
-            quillControl.__quill.enable(false);
+        disableQuillEditor: function (quillElement) {
+            quillElement.__quill.enable(false);
         }
     };
 })();
 
 var toolbarOptions = [
-    // Toggle buttons
+    // Toggled buttons.
     ['bold', 'italic', 'underline', 'strike'],
     ['blockquote', 'code-block'],
 
-    // Custom button values
+    // Custom button values.
     [{ 'header': 1 }, { 'header': 2 }],
     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
 
-    // Superscript and Subscript
+    // Superscript and subscript.
     [{ 'script': 'sub' }, { 'script': 'super' }],
 
-    // Outdent and Indent
+    // Outdent and indent.
     [{ 'indent': '-1' }, { 'indent': '+1' }],
 
-    // Text direction
+    // Text direction.
     [{ 'direction': 'rtl' }],
 
-    // Custom dropdown
+    // Custom dropdown.
     [{ 'size': ['small', false, 'large', 'huge'] }],
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 
-    // Dropdown with defaults from theme
+    // Dropdown with defaults from theme.
     [{ 'color': [] }, { 'background': [] }],
     [{ 'font': [] }],
     [{ 'align': [] }],
 
-    // Links, Upload Image, and Append Video buttons
+    // Links, upload image and append video buttons.
     ['link', 'image', 'video'],
 
-    // Remove Formatting button
+    // Remove formatting button.
     ['clean']
 ];

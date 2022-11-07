@@ -10,7 +10,7 @@ public class PostDTO
     public string ThumbnailImagePath { get; set; }
     [Required, MaxLength(512)]
     public string Excerpt { get; set; }
-    [Required, MaxLength(65536)]
+    [MaxLength(65536)]
     public string Content { get; set; }
     [Required]
     public bool Published { get; set; }
