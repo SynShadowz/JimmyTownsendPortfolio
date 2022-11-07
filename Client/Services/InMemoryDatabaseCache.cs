@@ -179,8 +179,8 @@ internal sealed class InMemoryDatabaseCache
         }
     }
 
-    internal event Action OnPostDataChanged;
-    private void NotifyPostsDataChanged() => OnPostDataChanged?.Invoke();
+    internal event Action OnPostsDataChanged;
+    private void NotifyPostsDataChanged() => OnPostsDataChanged?.Invoke();
 
     #endregion
 }
